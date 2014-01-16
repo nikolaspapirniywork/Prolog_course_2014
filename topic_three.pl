@@ -109,6 +109,18 @@ remove_first([X|Xs], X, Xs).
 remove_first([X|Xs], El, [X|R]) :-		
 	remove_first(Xs, El, R).
 
+remove_every_second([], []).
+remove_every_second([X], [X]).
+remove_every_second([X1,X2|Xs], [X1|R1]) :-
+	remove_every_second(Xs, R1).
+
+sum_of_elements([], 0).
+sum_of_elements([X|Xs], R) :-	
+	sum_of_elements(Xs, R1),
+	R is X + R1.
+
+	
+
 
 % ------------------------------------------------------------------------------
 
@@ -185,6 +197,22 @@ remove_first([X|Xs], El, [X|R]) :-
 		remove_first([1,2,3,2], 2, [1,3,2]).
 	test(remove_first_3) :-	
 		remove_first([], 2, []).
+
+	test(remove_every_second_1) :-
+		remove_every_second([1,2,3,4], [1,3]).
+	test(remove_every_second_2) :-
+		remove_every_second([1], [1]).
+	test(remove_every_second_3) :-
+		remove_every_second([], []).
+
+	test(sum_of_elements_1) :-
+		sum_of_elements([1,2,3,4,5], 15).
+	test(sum_of_elements_2) :-
+		sum_of_elements([], 0).
+	test(sum_of_elements_3) :-
+		sum_of_elements([1], 1).
+
+
 
 
 :- end_tests(topic_three).

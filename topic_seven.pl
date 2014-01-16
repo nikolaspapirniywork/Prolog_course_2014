@@ -23,7 +23,7 @@ derivative(cos(X), X, -sin(X)).
 derivative(ln(X), X, X^(-1)).
 derivative(log(X, A), X, 1/(X*ln(A))).
 derivative(sec(X), X, sin(X)/cos(X)^2).
-derivative(cosec(X), X, -cos(X)/sin(X)^2).
+derivative(cosec(X), X, -cos(X)/sin(X)^2).	
 
 derivative(thx(X), X, 1/ch(X)^2).
 derivative(arctg(X), X, 1/1+X^2).
@@ -70,6 +70,65 @@ has_function(F, X) :-
 	member(F1, Args),
 	has_function(F1, X), !.
 
+taylorFunction(F,X,A,N,First_result+R):-
+	calculate_function(F,X,A,First_result),
+	taylorFunctionN(F,X,A,N,1,R),!.
+
+calculate_function(F,X,A,R):-
+	F=..T,
+	replace_contains(T,[],X,A,R1),
+	R=..R1.
+
+replace_contains([], L, X, A, L).
+replace_contains([Y|Ys], L, X, A, R):-
+	replace_contains(Ys,L,X,A,R2),
+	in_table1(Y,X,A,R1),
+	append([R1], R2, R).
+
+in_table1(F,X,A,R):-
+	member(F,
+		[ln,arcsech,arccos,ctg,ch,sin,cos,^,+,-,*,/]
+		),
+	term_to_atom(F,R).
+in_table1(F,X,A,R):-
+	integer(F),
+	R is F, !.
+in_table1(F,X,A,R):-
+	F==X,
+	R is A, !.
+in_table1(F,X,A,R):-
+	F=..L,replace_contains(L,[],X,A,R1),
+	R=..R1, !.
+
+derivativeN(R,_,0,R).
+derivativeN(F,X,N,R):-
+	N1 is N-1,
+	derivative(F,X,R1),
+	derivativeN(R1,X,N1,R).
+
+taylorFunctionN(F,_,_,0,_,'0').
+taylorFunctionN(F, X, A, N, N2, F2*O+R):-
+	derivativeN(F, X, N, F1),
+	calculate_function(F1,X,A,F2),
+	factorial(N2,N3),
+	term_to_atom((X-A)^N2,GH_Atom),
+	term_to_atom(1/N3,GH_Atom1),
+	concat_atom([GH_Atom,GH_Atom1],*,O),
+	N4 is N2 + 1,
+	N1 is N - 1,
+	taylorFunctionN(F1, X, A, N1, N4, R).
+
+
+factorial(0, 1).
+factorial(0, 1).	
+factorial(N, R) :-
+	N1 is N - 1,
+	factorial(N1, R1),
+	R is N * R1.
+
+
+
 :- begin_tests(topic_seven).
+
 
 :- end_tests(topic_seven).
